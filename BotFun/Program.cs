@@ -15,6 +15,7 @@ public class Program
 	public static Task Main() => new Program().MainAsync();
 
 	private string? _BotToken;
+	private string? _BotGuildId;
 
 	public async Task MainAsync()
 	{
@@ -23,6 +24,7 @@ public class Program
 			.Build();
 
 		_BotToken = config["discordToken"]?.ToString();
+		_BotGuildId = config["discordGuild"]?.ToString();
 		
 		// TODO: Finish config
 
@@ -54,7 +56,7 @@ public class Program
 		var _client = provider.GetRequiredService<DiscordSocketClient>();
 		var sCommands = provider.GetRequiredService<InteractionService>();
 		await provider.GetRequiredService<InteractionHandler>().InitializeAsync();
-		//var config = provider.GetRequiredService<ConfigurationRoot>();
+
 		var pCommands = provider.GetRequiredService<PrefixHandler>();
 		pCommands.AddModule<PrefixModule>();
 		await pCommands.InitializeAsync();
@@ -67,7 +69,8 @@ public class Program
 		{
 			Console.WriteLine("Bot Ready!");
 			//await sCommands.RegisterCommandsToGuildAsync(UInt64.Parse(config["test"]))
-			await sCommands.RegisterCommandsGloballyAsync();
+			//await sCommands.RegisterCommandsGloballyAsync();
+			await sCommands.RegisterCommandsToGuildAsync(UInt64.Parse(_BotGuildId ?? ""));
 		};
 
 		await _client.LoginAsync(TokenType.Bot, _BotToken);
